@@ -1,6 +1,6 @@
 import { supabase } from "../lib/supabase";
-import { embedText } from "@/lib/rag/embeddings";
-import { retrieveSimilar } from "@/lib/rag/retriever";
+import { embedText } from "../../../lib/rag/embeddings";
+import { retrieveSimilar } from "../../../lib/rag/retriever";
 
 type MatchRow = {
   source: string;

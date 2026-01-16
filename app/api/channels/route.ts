@@ -30,7 +30,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { channelId, channelName } = body
+    const { channelId, channelName, serverId } = body
 
     if (!channelId || typeof channelId !== 'string') {
       return NextResponse.json(
@@ -42,7 +42,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const channel = await addAllowedChannel(channelId, channelName)
+    if (!serverId || typeof serverId !== 'string') {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Server ID is required',
+        },
+        { status: 400 }
+      )
+    }
+
+    const channel = await addAllowedChannel(channelId, channelName, serverId)
 
     return NextResponse.json({
       success: true,

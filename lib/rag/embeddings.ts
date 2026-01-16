@@ -12,9 +12,7 @@ export async function embedText(text: string): Promise<number[] | null> {
 
   try {
     const model = genAI.getGenerativeModel({ model: MODEL });
-    const result = await model.embedContent({
-      content: { parts: [{ text: clean }] },
-    });
+    const result = await model.embedContent(clean);
     const vector = result.embedding?.values;
     if (!vector || vector.length === 0) return null;
     return vector;

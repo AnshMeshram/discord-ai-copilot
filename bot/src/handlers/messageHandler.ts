@@ -4,7 +4,7 @@ import { aiService } from "../services/aiService";
 import { memoryService } from "../services/memoryService";
 import { ragService } from "../services/ragService";
 import { logger } from "../utils/logger";
-import { buildPrompt } from "@/lib/rag/prompt";
+import { buildPrompt } from "../../../lib/rag/prompt";
 
 export async function messageHandler(message: Message): Promise<void> {
   // Ignore bot messages and empty content
