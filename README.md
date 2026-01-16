@@ -1,3 +1,39 @@
+# Discord AI Copilot 🤖
+
+An AI-powered Discord assistant with admin-controlled behavior,
+memory, and Retrieval-Augmented Generation (RAG).
+
+## Features
+
+- Admin dashboard (Next.js)
+- Discord bot (Node.js)
+- Rolling memory summaries
+- RAG using Supabase pgvector
+- Gemini-powered AI
+- Secure auth & channel control
+
+## Tech Stack
+
+- Next.js + TypeScript
+- Discord.js
+- Supabase (Postgres + pgvector)
+- Gemini API
+- Railway (bot)
+- Vercel (admin)
+
+## Architecture
+
+Admin Dashboard → Supabase → Discord Bot → Gemini
+
+## Demo
+
+🎥 Loom: <link>
+🚀 Live Admin: <vercel link>
+
+## Setup
+
+See `.env.example`
+
 # Discord AI Copilot
 
 Admin-controlled AI Discord Copilot built with Next.js, Supabase, and AI APIs.

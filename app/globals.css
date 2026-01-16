@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --background: #0b0f16;
+  --surface: #121827;
+  --surface-muted: #1c2433;
+  --text-primary: #e8edf5;
+  --text-secondary: #b8c2d1;
+  --border: #1f2a3a;
+  --accent: #4f8bff;
+  --success: #22c55e;
+  --error: #f87171;
+  --warning: #fbbf24;
+  --focus: rgba(79, 139, 255, 0.4);
+  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.45);
+  --shadow-card-strong: 0 12px 48px rgba(0, 0, 0, 0.55);
+  --font-sans: "Inter", "SF Pro Text", -apple-system, system-ui, sans-serif;
+
+  /* Legacy aliases mapped to new tokens (remove once all usages are updated) */
+  --bg: var(--background);
+  --surface-elevated: var(--surface-muted);
+  --text: var(--text-primary);
+  --text-muted: var(--text-secondary);
+  --primary: var(--accent);
+  --primary-strong: color-mix(in srgb, var(--accent) 85%, #0b0f16 15%);
+  --secondary: var(--text-secondary);
+  --secondary-strong: var(--text-primary);
+}
+
+:root.light {
+  color-scheme: light;
+  --background: #f7f9fc;
+  --surface: #ffffff;
+  --surface-muted: #eef1f7;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --border: #d5d9e2;
+  --accent: #1d4ed8;
+  --success: #16a34a;
+  --error: #dc2626;
+  --warning: #d97706;
+  --focus: rgba(37, 99, 235, 0.25);
+  --shadow-card: 0 8px 30px rgba(15, 23, 42, 0.08);
+  --shadow-card-strong: 0 12px 45px rgba(15, 23, 42, 0.14);
+
+  --bg: var(--background);
+  --surface-elevated: var(--surface-muted);
+  --text: var(--text-primary);
+  --text-muted: var(--text-secondary);
+  --primary: var(--accent);
+  --primary-strong: color-mix(in srgb, var(--accent) 85%, #000 15%);
+  --secondary: var(--text-secondary);
+  --secondary-strong: var(--text-primary);
+}
+
+body {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+p {
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary-strong);
+}
+
+.focus-outline:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}

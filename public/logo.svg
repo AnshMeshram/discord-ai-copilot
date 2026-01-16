@@ -1,0 +1,129 @@
+<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#BBDEFB;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="400" cy="400" r="380" fill="url(#bgGradient)" filter="url(#shadow)"/>
+
+  <!-- Decorative stars -->
+  <g fill="#64B5F6" opacity="0.6">
+    <polygon points="200,120 210,145 237,145 216,162 225,187 200,170 175,187 184,162 163,145 190,145"/>
+    <polygon points="650,180 655,195 672,195 660,205 665,220 650,210 635,220 640,205 628,195 645,195"/>
+    <polygon points="120,400 130,425 157,425 136,442 145,467 120,450 95,467 104,442 83,425 110,425"/>
+    <polygon points="700,500 708,520 730,520 715,535 723,555 700,540 677,555 685,535 670,520 692,520"/>
+  </g>
+
+  <!-- Radio waves (antenna effect) -->
+  <g stroke="#64B5F6" stroke-width="8" fill="none" opacity="0.4">
+    <path d="M 400 100 Q 450 120 470 170"/>
+    <path d="M 400 85 Q 475 115 510 190"/>
+  </g>
+
+  <!-- Antenna -->
+  <line x1="400" y1="100" x2="400" y2="60" stroke="#0D47A1" stroke-width="12" stroke-linecap="round"/>
+  <!-- Antenna knob -->
+  <circle cx="400" cy="50" r="16" fill="#1565C0"/>
+
+  <!-- Head outline (outer circle) -->
+  <circle cx="400" cy="380" r="160" fill="none" stroke="#0D47A1" stroke-width="12"/>
+
+  <!-- Head fill (light blue) -->
+  <circle cx="400" cy="380" r="145" fill="#1E88E5"/>
+
+  <!-- Face white area -->
+  <ellipse cx="400" cy="390" rx="110" ry="120" fill="#E3F2FD"/>
+
+  <!-- Eyes -->
+  <circle cx="360" cy="350" r="20" fill="#0D47A1"/>
+  <circle cx="440" cy="350" r="20" fill="#0D47A1"/>
+  <!-- Eye shine -->
+  <circle cx="365" cy="345" r="7" fill="#FFFFFF"/>
+  <circle cx="445" cy="345" r="7" fill="#FFFFFF"/>
+
+  <!-- Smile -->
+  <path d="M 360 410 Q 400 430 440 410" stroke="#0D47A1" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- Brain area (cloud-like, light blue) -->
+  <g fill="#42A5F5" opacity="0.9">
+    <!-- Left lobe -->
+    <ellipse cx="340" cy="280" rx="45" ry="55"/>
+    <!-- Right lobe -->
+    <ellipse cx="460" cy="280" rx="45" ry="55"/>
+    <!-- Center top -->
+    <rect x="370" y="245" width="60" height="50" rx="20"/>
+    <!-- Bumps for brain texture -->
+    <circle cx="360" cy="290" r="8" fill="#64B5F6" opacity="0.7"/>
+    <circle cx="400" cy="270" r="7" fill="#64B5F6" opacity="0.7"/>
+    <circle cx="440" cy="290" r="8" fill="#64B5F6" opacity="0.7"/>
+  </g>
+
+  <!-- Brain outline (dividing line) -->
+  <path d="M 380 240 Q 400 220 420 240" stroke="#0D47A1" stroke-width="3" fill="none"/>
+
+  <!-- Headphones left -->
+  <g stroke="#1565C0" stroke-width="14" fill="none" stroke-linecap="round">
+    <path d="M 290 320 Q 260 300 240 340"/>
+    <circle cx="240" cy="380" r="35" fill="none"/>
+  </g>
+
+  <!-- Headphones right -->
+  <g stroke="#1565C0" stroke-width="14" fill="none" stroke-linecap="round">
+    <path d="M 510 320 Q 540 300 560 340"/>
+    <circle cx="560" cy="380" r="35" fill="none"/>
+  </g>
+
+  <!-- Microphone boom -->
+  <g stroke="#1565C0" stroke-width="10" fill="none" stroke-linecap="round">
+    <path d="M 280 380 Q 220 400 200 450"/>
+  </g>
+  <!-- Mic tip -->
+  <circle cx="200" cy="450" r="18" fill="#1565C0"/>
+
+  <!-- Neck/collar area -->
+  <ellipse cx="400" cy="520" rx="130" ry="70" fill="#0D47A1"/>
+  <ellipse cx="400" cy="520" rx="110" ry="50" fill="#1E88E5"/>
+
+  <!-- Body (chest armor look) -->
+  <g fill="#0D47A1" opacity="0.9">
+    <!-- Left shoulder -->
+    <ellipse cx="280" cy="600" rx="70" ry="90" fill="#1565C0"/>
+    <!-- Right shoulder -->
+    <ellipse cx="520" cy="600" rx="70" ry="90" fill="#1565C0"/>
+    <!-- Center chest -->
+    <rect x="330" y="520" width="140" height="150" rx="15" fill="#0D47A1"/>
+  </g>
+
+  <!-- Chest details (lighter) -->
+  <g fill="#1E88E5" opacity="0.7">
+    <rect x="350" y="540" width="100" height="120" rx="10"/>
+  </g>
+
+  <!-- Central chest light (accent) -->
+  <circle cx="400" cy="600" r="25" fill="#42A5F5"/>
+
+  <!-- Arms -->
+  <g fill="#1565C0">
+    <ellipse cx="220" cy="650" rx="45" ry="95"/>
+    <ellipse cx="580" cy="650" rx="45" ry="95"/>
+  </g>
+
+  <!-- Cloud base (sitting on clouds) -->
+  <g fill="#BBDEFB" opacity="0.8">
+    <ellipse cx="280" cy="720" rx="100" ry="50"/>
+    <ellipse cx="520" cy="720" rx="100" ry="50"/>
+    <ellipse cx="400" cy="740" rx="140" ry="40"/>
+  </g>
+
+  <!-- Cloud highlights -->
+  <g fill="#E3F2FD" opacity="0.9">
+    <ellipse cx="300" cy="710" rx="50" ry="25"/>
+    <ellipse cx="500" cy="710" rx="50" ry="25"/>
+  </g>
+</svg>

@@ -1,202 +1,317 @@
-import { createServiceRoleClient } from './server'
-import type { SystemSettings, AllowedChannel, ConversationSummary } from '@/lib/types'
+import { createServiceRoleClient } from "./server";
+import type {
+  SystemSettings,
+  AllowedChannel,
+  ConversationSummary,
+} from "@/lib/types";
 
-// Settings queries
+// Create service-role client ONCE
+const supabasePromise = createServiceRoleClient();
+
+const getSupabase = async () => {
+  return await supabasePromise;
+};
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
 export async function getSystemInstructions() {
-  const supabase = await createServiceRoleClient()
+  const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('settings')
-    .select('value')
-    .eq('key', 'system_instructions')
-    .single()
+    .from("settings")
+    .select("value")
+    .eq("key", "system_instructions")
+    .maybeSingle<{ value: SystemSettings["system_instructions"] }>();
 
-  if (error) throw error
-  return (data?.value as SystemSettings['system_instructions']) || { text: '' }
+  if (error) throw error;
+
+  return (
+    (data?.value as SystemSettings["system_instructions"]) ?? {
+      text: "",
+    }
+  );
 }
 
 export async function updateSystemInstructions(instructions: string) {
-  const supabase = await createServiceRoleClient()
-  const { data, error } = await supabase
-    .from('settings')
-    .upsert({
-      key: 'system_instructions',
-      value: { text: instructions },
-      updated_at: new Date().toISOString(),
-    })
-    .select()
-    .single()
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("settings").upsert(
+    [
+      {
+        key: "system_instructions",
+        value: { text: instructions },
+        updated_at: new Date().toISOString(),
+      },
+    ] as any,
+    { onConflict: "key" }
+  );
 
-  if (error) throw error
-  return data
+  if (error) throw error;
+
+  // Re-fetch for consistency
+  return getSystemInstructions();
 }
 
 export async function getAIConfig() {
-  const supabase = await createServiceRoleClient()
+  const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('settings')
-    .select('value')
-    .eq('key', 'ai_config')
-    .single()
+    .from("settings")
+    .select("value")
+    .eq("key", "ai_config")
+    .maybeSingle<{ value: SystemSettings["ai_config"] }>();
 
-  if (error) throw error
-  return (data?.value as SystemSettings['ai_config']) || {
-    model: 'llama-3.1-70b-versatile',
-    temperature: 0.7,
-    provider: 'groq',
-  }
-}
+  if (error) throw error;
 
-// Channel allow-list queries
-export async function getAllowedChannels() {
-  const supabase = await createServiceRoleClient()
-  const { data, error } = await supabase
-    .from('allowed_channels')
-    .select('*')
-    .order('added_at', { ascending: false })
-
-  if (error) throw error
-  return data as AllowedChannel[]
-}
-
-export async function addAllowedChannel(channelId: string, channelName?: string) {
-  const supabase = await createServiceRoleClient()
-  const { data, error } = await supabase
-    .from('allowed_channels')
-    .insert({
-      channel_id: channelId,
-      channel_name: channelName || null,
-    })
-    .select()
-    .single()
-
-  if (error) {
-    // If duplicate, return existing
-    if (error.code === '23505') {
-      const { data: existing } = await supabase
-        .from('allowed_channels')
-        .select('*')
-        .eq('channel_id', channelId)
-        .single()
-      return existing as AllowedChannel
+  return (
+    (data?.value as SystemSettings["ai_config"]) ?? {
+      provider: "gemini",
+      model: "gemini-1.5-flash",
+      temperature: 0.7,
+      max_tokens: 512,
     }
-    throw error
+  );
+}
+
+/* =====================================================
+   ALLOWED CHANNELS
+===================================================== */
+
+export async function getAllowedChannels(
+  serverId?: string
+): Promise<AllowedChannel[]> {
+  const supabase = await getSupabase();
+  let query = supabase
+    .from("allowed_channels")
+    .select("*")
+    .order("added_at", { ascending: false });
+  if (serverId) query = query.eq("server_id", serverId);
+  const { data, error } = await query;
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function isChannelAllowed(
+  channelId: string,
+  serverId?: string
+): Promise<boolean> {
+  const supabase = await getSupabase();
+  // Prefer matching by both server and channel; fallback to channel-only for legacy rows
+  let { data, error } = await supabase
+    .from("allowed_channels")
+    .select("id")
+    .eq("channel_id", channelId)
+    .eq(serverId ? "server_id" : "channel_id", serverId ?? channelId)
+    .maybeSingle();
+
+  if ((error && (error as any).code === "PGRST116") || !data) {
+    ({ data, error } = await supabase
+      .from("allowed_channels")
+      .select("id")
+      .eq("channel_id", channelId)
+      .maybeSingle());
   }
-  return data as AllowedChannel
+
+  if (error) throw error;
+  return Boolean(data);
 }
 
-export async function removeAllowedChannel(channelId: string) {
-  const supabase = await createServiceRoleClient()
-  const { error } = await supabase
-    .from('allowed_channels')
+export async function addAllowedChannel(
+  channelId: string,
+  channelName: string | undefined,
+  serverId: string
+): Promise<AllowedChannel> {
+  const supabase = await getSupabase();
+  const { data, error } = await supabase
+    .from("allowed_channels")
+    .insert([
+      {
+        channel_id: channelId,
+        channel_name: channelName ?? null,
+        server_id: serverId,
+      },
+    ] as any)
+    .select()
+    .maybeSingle();
+
+  // Insert succeeded
+  if (data) return data as AllowedChannel;
+
+  // Duplicate key → fetch existing
+  if (error?.code === "23505") {
+    const { data: existing, error: fetchError } = await supabase
+      .from("allowed_channels")
+      .select("*")
+      .eq("channel_id", channelId)
+      .eq("server_id", serverId)
+      .maybeSingle();
+
+    if (fetchError || !existing) {
+      throw fetchError ?? new Error("Failed to fetch existing channel");
+    }
+
+    return existing as AllowedChannel;
+  }
+
+  if (error) throw error;
+  throw new Error("Unexpected error while adding allowed channel");
+}
+
+export async function removeAllowedChannel(
+  channelId: string,
+  serverId?: string
+) {
+  const supabase = await getSupabase();
+  let q = supabase
+    .from("allowed_channels")
     .delete()
-    .eq('channel_id', channelId)
+    .eq("channel_id", channelId);
+  if (serverId) q = q.eq("server_id", serverId);
+  const { error } = await q;
 
-  if (error) throw error
-  return { success: true }
+  if (error) throw error;
+  return { success: true };
 }
 
-export async function isChannelAllowed(channelId: string): Promise<boolean> {
-  const supabase = await createServiceRoleClient()
-  const { data, error } = await supabase
-    .from('allowed_channels')
-    .select('id')
-    .eq('channel_id', channelId)
-    .single()
+/* =====================================================
+   CONVERSATION MEMORY (ROLLING SUMMARY)
+===================================================== */
 
-  if (error && error.code !== 'PGRST116') throw error // PGRST116 = no rows returned
-  return !!data
-}
+export async function getConversationSummary(
+  channelId: string,
+  serverId?: string
+): Promise<ConversationSummary | null> {
+  const supabase = await getSupabase();
+  let { data, error } = await supabase
+    .from("summaries")
+    .select("*")
+    .eq("channel_id", channelId)
+    .eq(serverId ? "server_id" : "channel_id", serverId ?? channelId)
+    .maybeSingle();
 
-// Memory/Summary queries
-export async function getConversationSummary(channelId: string) {
-  const supabase = await createServiceRoleClient()
-  const { data, error } = await supabase
-    .from('summaries')
-    .select('*')
-    .eq('channel_id', channelId)
-    .single()
+  if ((error && (error as any).code === "PGRST116") || !data) {
+    ({ data, error } = await supabase
+      .from("summaries")
+      .select("*")
+      .eq("channel_id", channelId)
+      .maybeSingle());
+  }
 
-  if (error && error.code !== 'PGRST116') throw error
-  return data as ConversationSummary | null
-}
-
-export async function getAllSummaries() {
-  const supabase = await createServiceRoleClient()
-  const { data, error } = await supabase
-    .from('summaries')
-    .select('*')
-    .order('updated_at', { ascending: false })
-
-  if (error) throw error
-  return data as ConversationSummary[]
+  if (error) throw error;
+  return data ?? null;
 }
 
 export async function updateConversationSummary(
   channelId: string,
   summary: string,
-  messageCount: number
+  serverId?: string
+): Promise<ConversationSummary> {
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("summaries").upsert(
+    [
+      {
+        channel_id: channelId,
+        summary,
+        updated_at: new Date().toISOString(),
+        last_message_at: new Date().toISOString(),
+        server_id: serverId ?? null,
+      },
+    ] as any,
+    { onConflict: "channel_id" }
+  );
+
+  if (error) throw error;
+
+  const { data, error: fetchError } = await supabase
+    .from("summaries")
+    .select("*")
+    .eq("channel_id", channelId)
+    .eq(serverId ? "server_id" : "channel_id", serverId ?? channelId)
+    .single();
+
+  if (fetchError || !data) {
+    throw fetchError ?? new Error("Failed to fetch updated summary");
+  }
+
+  return data as ConversationSummary;
+}
+
+export async function resetConversationSummary(
+  channelId: string,
+  serverId?: string
 ) {
-  const supabase = await createServiceRoleClient()
+  const supabase = await getSupabase();
+  let q = supabase.from("summaries").delete().eq("channel_id", channelId);
+  if (serverId) q = q.eq("server_id", serverId);
+  const { error } = await q;
+
+  if (error) throw error;
+  return { success: true };
+}
+
+/* =====================================================
+   SUMMARIES (LIST ALL)
+===================================================== */
+export async function getAllSummaries() {
+  const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('summaries')
-    .upsert({
-      channel_id: channelId,
-      summary,
-      message_count: messageCount,
-      updated_at: new Date().toISOString(),
-    })
-    .select()
-    .single()
+    .from("summaries")
+    .select("*")
+    .order("updated_at", { ascending: false });
 
-  if (error) throw error
-  return data as ConversationSummary
+  if (error) throw error;
+  return data as ConversationSummary[];
 }
 
-export async function resetConversationSummary(channelId: string) {
-  const supabase = await createServiceRoleClient()
-  const { error } = await supabase
-    .from('summaries')
-    .delete()
-    .eq('channel_id', channelId)
+/* =====================================================
+   MESSAGES (OPTIONAL / SHORT-LIVED)
+===================================================== */
 
-  if (error) throw error
-  return { success: true }
-}
-
-// Message queries (for bot)
 export async function saveMessage(
   channelId: string,
   messageId: string,
   userId: string,
   username: string | null,
-  content: string
+  content: string,
+  role: "user" | "assistant",
+  serverId?: string
 ) {
-  const supabase = await createServiceRoleClient()
+  const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('messages')
-    .insert({
-      channel_id: channelId,
-      message_id: messageId,
-      user_id: userId,
-      username,
-      content,
-    })
+    .from("messages")
+    .insert([
+      {
+        channel_id: channelId,
+        message_id: messageId,
+        user_id: userId,
+        username,
+        content,
+        role,
+        server_id: serverId ?? null,
+      },
+    ] as any)
     .select()
-    .single()
+    .single();
 
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
-export async function getRecentMessages(channelId: string, limit: number = 20) {
-  const supabase = await createServiceRoleClient()
-  const { data, error } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('channel_id', channelId)
-    .order('created_at', { ascending: false })
-    .limit(limit)
+export async function getRecentMessages(
+  channelId: string,
+  limit = 20,
+  serverId?: string
+) {
+  const supabase = await getSupabase();
+  let q = supabase
+    .from("messages")
+    .select("*")
+    .eq("channel_id", channelId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (serverId) q = q.eq("server_id", serverId);
+  const { data, error } = await q;
 
-  if (error) throw error
-  return data.reverse() // Return in chronological order
+  if (error) throw error;
+  return (data ?? []).reverse();
 }
