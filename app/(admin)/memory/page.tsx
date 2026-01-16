@@ -52,14 +52,14 @@ export default function MemoryPage() {
           error || "Could not load memory data. Please try again.";
         setLoadError(message);
         toastHelpers.error(message, {
-          id: loadToast,
+          id: loadToast ?? undefined,
         });
       }
     } catch (error) {
       const message = "Could not load memory data. Please try again.";
       setLoadError(message);
       toastHelpers.error(message, {
-        id: loadToast,
+          id: loadToast ?? undefined,
       });
     } finally {
       setLoading(false);
@@ -226,9 +226,11 @@ export default function MemoryPage() {
               title={memoryCopy.emptyTitle}
               description={memoryCopy.emptyDescription}
               primaryAction={
-                <Button variant="primary" size="sm" asChild>
-                  <Link href="/channels">Open Channels</Link>
-                </Button>
+                <Link href="/channels">
+                  <Button variant="primary" size="sm">
+                    Open Channels
+                  </Button>
+                </Link>
               }
               secondaryAction={
                 <Button
