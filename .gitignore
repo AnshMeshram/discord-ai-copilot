@@ -52,3 +52,17 @@ next-env.d.ts
 /bot/.env.local
 /bot/.env.*
 /bot/dist
+
+# internal documentation (implementation guides, phase docs, etc.)
+GEMINI_SETUP.md
+FREE_SETUP_GUIDE.md
+FULL_SETUP_GUIDE.md
+IMPLEMENTATION_GUIDE.md
+MEMORY_PERSISTENCE_TEST_GUIDE.md
+MEMORY_SYSTEM_REVIEW.md
+PHASE*.md
+PROJECT_PLAN.md
+QUICK_START.md
+REQUIREMENTS_ALIGNMENT.md
+SETUP_ENV.md
+TECH_DECISIONS.md
