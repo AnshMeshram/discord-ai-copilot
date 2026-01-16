@@ -14,15 +14,15 @@ type Props = {
 const toneMap: Record<StatusTone, { icon: typeof Info; classes: string }> = {
   info: {
     icon: Info,
-    classes: "border-blue-200 bg-blue-50 text-blue-800",
+    classes: "border-blue-500/30 bg-blue-500/10 text-blue-400",
   },
   success: {
     icon: CheckCircle2,
-    classes: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    classes: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
   },
   error: {
     icon: AlertCircle,
-    classes: "border-amber-200 bg-amber-50 text-amber-800",
+    classes: "border-amber-500/30 bg-amber-500/10 text-amber-400",
   },
 };
 

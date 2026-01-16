@@ -39,7 +39,7 @@ export default function ChannelsPage() {
     setLoading(true);
     const refreshToast = showFeedback
       ? toastHelpers.loading("Refreshing channels...")
-      : null;
+      : undefined;
     try {
       const { data, error } = await apiGet<Channel[]>("/api/channels");
       if (data) {
