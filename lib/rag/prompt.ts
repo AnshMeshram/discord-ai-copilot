@@ -1,4 +1,4 @@
-// RAG prompt builder removed.
-export function buildPrompt(): string {
-  throw new Error("RAG prompt builder removed");
+// RAG prompt builder removed — stub to avoid breaking imports.
+export function ragPromptRemoved(): never {
+  throw new Error("RAG functionality has been removed");
 }

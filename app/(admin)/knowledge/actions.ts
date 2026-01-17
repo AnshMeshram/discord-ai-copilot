@@ -1,10 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import {
-  ingestDocument,
-  deleteKnowledgeChunk,
-} from "@/lib/supabase/rag.queries";
+
+// RAG removed: ingestion and chunk deletion are no-ops.
 
 export async function ingestKnowledge(formData: FormData): Promise<void> {
   const source = (formData.get("source") as string)?.trim() || "docs";
@@ -17,12 +15,9 @@ export async function ingestKnowledge(formData: FormData): Promise<void> {
   }
 
   try {
-    const result = await ingestDocument({ source, content, chunkSize });
+    // RAG disabled — no-op ingest. Keep behavior silent and revalidate.
     revalidatePath("/knowledge");
-    // Optionally hook a toast via client action in the future
-    console.log(
-      `Ingested ${result.inserted} chunk(s). Skipped ${result.skipped}.`
-    );
+    console.log(`Ingest disabled; received ${content?.slice(0, 60)}...`);
   } catch (error) {
     console.error(error);
   }
@@ -33,7 +28,7 @@ export async function deleteChunk(formData: FormData): Promise<void> {
   if (!id) return;
 
   try {
-    await deleteKnowledgeChunk(id);
+    // RAG disabled — pretend deletion succeeded so UI remains stable.
     revalidatePath("/knowledge");
   } catch (error) {
     console.error(error);

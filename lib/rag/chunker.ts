@@ -1,4 +1,5 @@
 // RAG chunker removed.
 export function chunkText(): string[] {
-  throw new Error("RAG chunker removed");
+  // RAG chunker removed — stub to avoid breaking imports.
+  throw new Error("RAG functionality has been removed");
 }

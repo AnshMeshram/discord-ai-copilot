@@ -1,4 +1,3 @@
-import { listKnowledgeChunks } from "@/lib/supabase/rag.queries";
 import { ingestKnowledge, deleteChunk } from "./actions";
 import { Button } from "@/components/ui/button";
 import { StatusBanner } from "@/app/(admin)/components/banners/StatusBanner";
@@ -6,7 +5,8 @@ import { StatusBanner } from "@/app/(admin)/components/banners/StatusBanner";
 export const dynamic = "force-dynamic";
 
 export default async function KnowledgePage() {
-  const chunks = await listKnowledgeChunks(50);
+  // RAG removed: ingestion and chunk listing are disabled.
+  const chunks = [];
 
   return (
     <div className="space-y-6">

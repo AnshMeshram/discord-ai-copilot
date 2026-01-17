@@ -1,4 +1,4 @@
-// RAG embeddings removed.
-export async function embedText(): Promise<null> {
-  throw new Error("RAG embeddings removed");
+// RAG embeddings removed — stub to avoid breaking imports.
+export function ragEmbeddingsRemoved(): never {
+  throw new Error("RAG functionality has been removed");
 }

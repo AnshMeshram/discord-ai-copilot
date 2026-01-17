@@ -20,6 +20,15 @@ export async function messageHandler(message: Message): Promise<void> {
   const content = message.content;
 
   try {
+    // Quick health command for deployment checks
+    if (content.trim().toLowerCase() === "!ping") {
+      try {
+        await message.reply("pong");
+      } catch (err) {
+        logger.error(`Failed to reply to ping: ${String(err)}`);
+      }
+      return;
+    }
     // Step 1: Check if channel is allowed (support threads via parent channel)
     const serverId = (message.guild?.id ?? null) as string | null;
     const allowedDirect = await databaseService.isChannelAllowed(
@@ -76,10 +85,8 @@ export async function messageHandler(message: Message): Promise<void> {
 
     const prompt = buildPrompt({
       instructions: instructions.text,
-      summary: summary?.summary || "No previous context.",
       recentMessages: messagesText,
       userMessage: content,
-      retrieved: retrievedText,
     });
 
     // Step 5: Show typing indicator
@@ -246,22 +253,15 @@ function splitMessage(text: string, maxLength: number): string[] {
 }
 function buildPrompt({
   instructions,
-  summary,
   recentMessages,
   userMessage,
-  retrieved,
 }: {
   instructions: string;
-  summary: string;
   recentMessages: string;
   userMessage: string;
-  retrieved: string;
 }): string {
   let prompt = `${instructions}\n\n`;
-  prompt += `Conversation Summary:\n${summary}\n\n`;
-  if (retrieved && retrieved.trim().length > 0) {
-    prompt += `Relevant Knowledge:\n${retrieved}\n\n`;
-  }
+  // Include recent messages for immediate conversational context
   prompt += `Recent Messages:\n${recentMessages}\n\n`;
   prompt += `User: ${userMessage}\n\n`;
   prompt += `Assistant:`;
