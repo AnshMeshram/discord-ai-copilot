@@ -11,13 +11,20 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value || !value.trim()) {
+    throw new Error(`Missing required env: ${name}`);
+  }
+  return value;
+}
 
+const supabaseUrl = requireEnv("NEXT_PUBLIC_SUPABASE_URL");
+const serviceRoleKey = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
 const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 // Test configuration
-const CHANNEL_ID = "1461397065128214683"; // Your test channel
+const CHANNEL_ID = process.env.TEST_CHANNEL_ID || "1461397065128214683"; // Your test channel
 const TARGET_MESSAGE_COUNT = 20; // Test up to 20 messages
 
 interface TestResult {
@@ -53,7 +60,7 @@ async function testMemoryPersistence() {
       addResult(
         "Summaries Table Access",
         false,
-        `Database error: ${summError.message}`
+        `Database error: ${summError.message}`,
       );
       return;
     }
@@ -62,7 +69,7 @@ async function testMemoryPersistence() {
       addResult(
         "Summaries Table Access",
         false,
-        "No summary found for channel. Start conversation first."
+        "No summary found for channel. Start conversation first.",
       );
       return;
     }
@@ -70,7 +77,7 @@ async function testMemoryPersistence() {
     addResult(
       "Summaries Table Access",
       true,
-      `Found summary (${summaries.message_count} messages)`
+      `Found summary (${summaries.message_count} messages)`,
     );
 
     // Test 2: Verify message_count is tracking correctly
@@ -81,7 +88,7 @@ async function testMemoryPersistence() {
     addResult(
       "Message Count Tracking",
       countValid,
-      `Current count: ${messageCount} messages`
+      `Current count: ${messageCount} messages`,
     );
 
     // Test 3: Verify summary content exists and is concise
@@ -94,7 +101,7 @@ async function testMemoryPersistence() {
     addResult(
       "Summary Content",
       isConci,
-      `${summaryLength} chars, ~${sentences} sentences`
+      `${summaryLength} chars, ~${sentences} sentences`,
     );
 
     if (!isConci) {
@@ -112,7 +119,7 @@ async function testMemoryPersistence() {
       addResult(
         "Message Role Tracking",
         false,
-        `Query error: ${msgError.message}`
+        `Query error: ${msgError.message}`,
       );
       return;
     }
@@ -126,7 +133,7 @@ async function testMemoryPersistence() {
     addResult(
       "Message Role Tracking",
       rolesCorrect,
-      `User: ${userMsgs}, Bot: ${botMsgs}, Total: ${totalMsgs}`
+      `User: ${userMsgs}, Bot: ${botMsgs}, Total: ${totalMsgs}`,
     );
 
     // Test 5: Verify summary was updated recently
@@ -138,7 +145,7 @@ async function testMemoryPersistence() {
     addResult(
       "Summary Recency",
       isRecent,
-      `Last updated ${Math.round(minutesAgo)} minutes ago`
+      `Last updated ${Math.round(minutesAgo)} minutes ago`,
     );
 
     // Test 6: Verify token efficiency
@@ -146,14 +153,14 @@ async function testMemoryPersistence() {
     const fullHistoryTokens = Math.ceil(totalMsgs * 15); // ~15 tokens per message
     const summaryTokens = Math.ceil(summaryLength / 4); // ~1 token per 4 chars
     const savings = Math.round(
-      ((fullHistoryTokens - summaryTokens) / fullHistoryTokens) * 100
+      ((fullHistoryTokens - summaryTokens) / fullHistoryTokens) * 100,
     );
 
     const efficiencyGood = savings > 80;
     addResult(
       "Token Efficiency",
       efficiencyGood,
-      `${savings}% savings (${fullHistoryTokens} → ${summaryTokens} tokens)`
+      `${savings}% savings (${fullHistoryTokens} → ${summaryTokens} tokens)`,
     );
 
     // Test 7: Check if next summary would trigger correctly
@@ -164,7 +171,7 @@ async function testMemoryPersistence() {
     addResult(
       "Summary Trigger Schedule",
       true,
-      `Next summary at ${nextTrigger} messages (${triggerDistance} to go)`
+      `Next summary at ${nextTrigger} messages (${triggerDistance} to go)`,
     );
 
     // Test 8: Verify database integrity
@@ -178,7 +185,7 @@ async function testMemoryPersistence() {
     addResult(
       "Database Integrity",
       !!hasAllFields,
-      "All required fields present"
+      "All required fields present",
     );
 
     // Summary report
@@ -206,7 +213,7 @@ async function testMemoryPersistence() {
     } else {
       log(
         "❌",
-        "Memory persistence test FAILED. Fix issues before production."
+        "Memory persistence test FAILED. Fix issues before production.",
       );
       process.exit(1);
     }
