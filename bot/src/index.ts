@@ -36,7 +36,7 @@ client.on("messageCreate", async (message) => {
         message.channel.type
       } authorBot=${message.author.bot} contentLen=${
         message.content?.length ?? 0
-      }`
+      }`,
     );
     // Ignore bot messages
     if (message.author.bot) return;
@@ -50,5 +50,8 @@ client.on("messageCreate", async (message) => {
     logger.error("Message handler error:", error);
   }
 });
+
+console.log("DISCORD_BOT_TOKEN exists:", !!process.env.DISCORD_BOT_TOKEN);
+console.log("DISCORD_BOT_TOKEN length:", process.env.DISCORD_BOT_TOKEN?.length);
 
 client.login(process.env.DISCORD_BOT_TOKEN);
