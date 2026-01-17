@@ -1,106 +1,51 @@
-import { createServiceRoleClient } from "./server";
-import { embedText } from "@/lib/rag/embeddings";
-import { chunkText } from "@/lib/rag/chunker";
+// RAG supabase queries removed. These functions previously handled knowledge
+// chunk ingestion and semantic search via Supabase. They have been deleted to
+// remove RAG functionality. Any calls to these functions should be removed or
+// replaced with alternative logic.
 
-// The Supabase type file does not include the RAG tables/RPC yet, so we use a
-// lightly typed client to avoid cascading type errors while still retaining
-// runtime safety.
-const supabasePromise = createServiceRoleClient();
-const getSupabase = async () => (await supabasePromise) as any;
+export type IngestResult = {
+  inserted: number;
+  skipped: number;
+};
 
 export type KnowledgeChunk = {
   id: string;
-  source: string;
-  source_id: string | null;
-  content: string;
-  metadata: Record<string, unknown>;
-  created_at: string;
-  similarity?: number;
+  source?: string;
+  source_id?: string;
+  content?: string;
+  created_at?: string;
+  [key: string]: any;
 };
 
 export async function searchKnowledgeChunks(
-  embedding: number[],
-  matchCount = 5,
-  filterSource?: string
+  _query: string,
 ): Promise<KnowledgeChunk[]> {
-  const supabase = await getSupabase();
-  const { data, error } = await supabase.rpc("match_knowledge_chunks", {
-    query_embedding: embedding,
-    match_count: matchCount,
-    filter_source: filterSource ?? null,
-  });
-
-  if (error) throw error;
-  return (
-    data?.map((row: any) => ({
-      id: row.id,
-      content: row.content,
-      source: row.source,
-      source_id: row.source_id,
-      metadata: row.metadata || {},
-      created_at: row.created_at ?? new Date().toISOString(),
-      similarity: row.similarity,
-    })) || []
-  );
+  // RAG removed: return empty result set so UI can render normally.
+  return [];
 }
 
 export async function listKnowledgeChunks(
-  limit = 50
+  _sourceOrLimit?: string | number,
 ): Promise<KnowledgeChunk[]> {
-  const supabase = await getSupabase();
-  const { data, error } = await supabase
-    .from("knowledge_chunks")
-    .select("id, source, source_id, content, metadata, created_at")
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (error) throw error;
-  return (data as KnowledgeChunk[]) || [];
+  // RAG removed: return empty list to avoid breaking admin pages.
+  // Accept either a source string or a numeric limit used by callers.
+  return [];
 }
 
-export async function deleteKnowledgeChunk(id: string) {
-  const supabase = await getSupabase();
-  const { error } = await supabase
-    .from("knowledge_chunks")
-    .delete()
-    .eq("id", id);
-  if (error) throw error;
-  return { success: true };
+export async function deleteKnowledgeChunk(_id: string): Promise<void> {
+  // No-op: RAG backend removed. Silently succeed to keep admin flows stable.
+  return;
 }
 
-export type IngestResult = { inserted: number; skipped: number };
-
-export async function ingestDocument(options: {
+export async function ingestDocument({
+  source,
+  content,
+  chunkSize,
+}: {
   source: string;
-  sourceId?: string;
   content: string;
   chunkSize?: number;
 }): Promise<IngestResult> {
-  const supabase = await getSupabase();
-  const chunkSize = options.chunkSize ?? 800;
-  const chunks = chunkText(options.content, chunkSize);
-  let inserted = 0;
-  let skipped = 0;
-
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-    const embedding = await embedText(chunk);
-    if (!embedding) {
-      skipped++;
-      continue;
-    }
-
-    const { error } = await supabase.from("knowledge_chunks").upsert({
-      source: options.source,
-      source_id: options.sourceId ?? null,
-      content: chunk,
-      metadata: { chunk: i + 1, total_chunks: chunks.length },
-      embedding,
-    });
-
-    if (error) throw error;
-    inserted++;
-  }
-
-  return { inserted, skipped };
+  // No-op ingestion: return zeros so call sites receive a valid response.
+  return { inserted: 0, skipped: 0 };
 }

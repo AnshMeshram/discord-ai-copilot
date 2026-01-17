@@ -19,7 +19,6 @@
   },
   "include": [
     "src/**/*",
-    "../lib/rag/**/*",
     "../lib/types/**/*",
     "../lib/utils.ts",
     "../lib/supabase/**/*.ts"
