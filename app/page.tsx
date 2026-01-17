@@ -37,24 +37,7 @@ export default function Home() {
           </div>
 
           {/* Features */}
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 rounded-lg border border-border bg-surfaceMuted p-3">
-              <Bot className="h-4 w-4 text-accent" />
-              <span className="text-xs text-text-muted">AI Instructions</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-lg border border-border bg-surfaceMuted p-3">
-              <MessageSquare className="h-4 w-4 text-accent" />
-              <span className="text-xs text-text-muted">Channel Control</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-lg border border-border bg-surfaceMuted p-3">
-              <Database className="h-4 w-4 text-accent" />
-              <span className="text-xs text-text-muted">Memory System</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-lg border border-border bg-surfaceMuted p-3">
-              <Settings className="h-4 w-4 text-accent" />
-              <span className="text-xs text-text-muted">Full Settings</span>
-            </div>
-          </div>
+          <div className="mt-6 grid grid-cols-2 gap-3"></div>
 
           {/* Login Button */}
           <Link
@@ -73,4 +56,22 @@ export default function Home() {
       </div>
     </main>
   );
+}
+
+export default function Home() {
+  return (
+    <main
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <h1>Discord AI Copilot Admin Console</h1>
+    </main>
+  );
+}
+{
+  /* Footer */
 }
