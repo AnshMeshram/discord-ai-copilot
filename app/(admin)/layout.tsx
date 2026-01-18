@@ -4,9 +4,25 @@ import { ReactNode, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
-import { AppToaster } from "@/components/ui/toaster";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+
+function cn(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(" ");
+}
+
+function createClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error(
+      "Missing Supabase environment variables NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    );
+  }
+  return createSupabaseClient(supabaseUrl, supabaseKey);
+}
+// Update the import path if the file exists at a different location, for example:
+import { AppToaster } from "../../components/ui/toaster";
+// Or create the file at 'components/ui/toaster.tsx' if it does not exist.
 import { LogOut } from "lucide-react";
 
 function NavLink({
@@ -28,7 +44,7 @@ function NavLink({
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]",
         isActive
           ? "bg-surfaceElevated text-text font-semibold border border-border"
-          : "text-text-muted hover:bg-surfaceElevated hover:text-text"
+          : "text-text-muted hover:bg-surfaceElevated hover:text-text",
       )}
     >
       {children}
